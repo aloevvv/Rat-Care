@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rat Sim</title>
+  <style>
+    body { font-family: sans-serif; background: #f5f5dc; padding: 20px; }
+    .box { background: #fff; padding: 15px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 0 5px #ccc; }
+    button { margin: 5px; }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>🐀 Your Rat</h2>
+  <p>Name: <span id="ratNameDisplay">Rat</span></p>
+  <input type="text" id="ratNameInput" placeholder="Rename your rat" />
+  <button onclick="renameRat()">Rename</button>
+
+  <p>Gender: <span id="ratGenderDisplay">Male</span></p>
+  <select id="ratGenderSelect" onchange="changeGender()">
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+    <option value="Non-binary">Non-binary</option>
+  </select>
+</div>
+
+<div class="box">
+  <h3>🧀 Rat Needs</h3>
+  <p>Hunger: <span id="ratHunger">100</span>/100</p>
+  <p>Thirst: <span id="ratThirst">100</span>/100</p>
+  <button onclick="feedRat()">Feed Cheese</button>
+  <button onclick="giveWater()">Give Water</button>
+</div>
+
+<script>
+  let ratName = "Rat";
+  let ratGender = "Male";
+  let ratHunger = 100;
+  let ratThirst = 100;
+
+  function renameRat() {
+    const input = document.getElementById("ratNameInput").value;
+    if (input.trim() !== "") {
+      ratName = input;
+      updateRatStatus();
+    }
+  }
+
+  function changeGender() {
+    const select = document.getElementById("ratGenderSelect");
+    ratGender = select.value;
+    updateRatStatus();
+  }
+
+  function feedRat() {
+    if (ratHunger < 100) {
+      ratHunger += 10;
+      if (ratHunger > 100) ratHunger = 100;
+    }
+    updateRatStatus();
+  }
+
+  function giveWater() {
+    if (ratThirst < 100) {
+      ratThirst += 10;
+      if (ratThirst > 100) ratThirst = 100;
+    }
+    updateRatStatus();
+  }
+
+  function updateRatStatus() {
+    document.getElementById("ratNameDisplay").textContent = ratName;
+    document.getElementById("ratGenderDisplay").textContent = ratGender;
+    document.getElementById("ratHunger").textContent = ratHunger;
+    document.getElementById("ratThirst").textContent = ratThirst;
+  }
+
+  updateRatStatus();
+</script>
+
+</body>
+</html>
