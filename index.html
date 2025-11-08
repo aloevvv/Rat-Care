@@ -22,14 +22,22 @@
     <option value="Female">Female</option>
     <option value="Non-binary">Non-binary</option>
   </select>
+
+  <p>Mood: <span id="ratMoodDisplay">Happy</span></p>
 </div>
 
 <div class="box">
-  <h3>🧀 Rat Needs</h3>
+  <h3>🧀 Needs</h3>
   <p>Hunger: <span id="ratHunger">100</span>/100</p>
   <p>Thirst: <span id="ratThirst">100</span>/100</p>
   <button onclick="feedRat()">Feed Cheese</button>
   <button onclick="giveWater()">Give Water</button>
+</div>
+
+<div class="box">
+  <h3>🧭 Exploration</h3>
+  <button onclick="explore()">Explore the Alley</button>
+  <div id="explorationPopup" style="display:none; background:#eee; padding:10px; margin-top:10px; border-radius:6px;"></div>
 </div>
 
 <script>
@@ -37,6 +45,8 @@
   let ratGender = "Male";
   let ratHunger = 100;
   let ratThirst = 100;
+  let ratMood = "Happy";
+  let inventory = { food: 2, water: 2, fluff: 1 };
 
   function renameRat() {
     const input = document.getElementById("ratNameInput").value;
@@ -47,35 +57,84 @@
   }
 
   function changeGender() {
-    const select = document.getElementById("ratGenderSelect");
-    ratGender = select.value;
+    ratGender = document.getElementById("ratGenderSelect").value;
     updateRatStatus();
   }
 
   function feedRat() {
-    if (ratHunger < 100) {
+    if (ratHunger < 100 && inventory.food > 0) {
       ratHunger += 10;
       if (ratHunger > 100) ratHunger = 100;
+      inventory.food--;
     }
     updateRatStatus();
   }
 
   function giveWater() {
-    if (ratThirst < 100) {
+    if (ratThirst < 100 && inventory.water > 0) {
       ratThirst += 10;
       if (ratThirst > 100) ratThirst = 100;
+      inventory.water--;
     }
     updateRatStatus();
   }
 
+  function updateMood() {
+    if (ratHunger < 30 || ratThirst < 30) {
+      ratMood = "Grumpy";
+    } else if (ratHunger > 80 && ratThirst > 80) {
+      ratMood = "Happy";
+    } else {
+      ratMood = "Neutral";
+    }
+  }
+
+  function explore() {
+    updateMood();
+    let popup = document.getElementById("explorationPopup");
+    popup.style.display = "block";
+    let found = [];
+    let successChance = ratMood === "Grumpy" ? 0.3 : ratMood === "Happy" ? 0.9 : 0.6;
+
+    if (Math.random() < successChance) {
+      if (Math.random() < 0.5) { inventory.food++; found.push("🍞 Food"); }
+      if (Math.random() < 0.5) { inventory.water++; found.push("💧 Water"); }
+      if (Math.random() < 0.3) { inventory.fluff++; found.push("🧻 Fluff"); }
+    }
+
+    popup.innerHTML = found.length > 0
+      ? `You found: ${found.join(', ')}`
+      : "You found nothing this time.";
+
+    updateRatStatus();
+  }
+
   function updateRatStatus() {
+    updateMood();
     document.getElementById("ratNameDisplay").textContent = ratName;
     document.getElementById("ratGenderDisplay").textContent = ratGender;
+    document.getElementById("ratMoodDisplay").textContent = ratMood;
     document.getElementById("ratHunger").textContent = ratHunger;
     document.getElementById("ratThirst").textContent = ratThirst;
   }
 
   updateRatStatus();
+  
+  setInterval(() => {
+  // Random decay between 1 and 3
+  const hungerLoss = Math.floor(Math.random() * 3) + 1;
+  const thirstLoss = Math.floor(Math.random() * 3) + 1;
+
+  ratHunger -= hungerLoss;
+  ratThirst -= thirstLoss;
+
+  // Clamp values to 0 minimum
+  if (ratHunger < 0) ratHunger = 0;
+  if (ratThirst < 0) ratThirst = 0;
+
+  updateRatStatus();
+}, 60000);
+
 </script>
 
 </body>
